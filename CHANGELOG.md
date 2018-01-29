@@ -27,7 +27,7 @@
 [2.1.1] - 2017-07-31
 --------------------
 - [x] FIXED minor bug in loading of the async module methods
-- [x] ADDED mandatory callback to `config` event callback
+- [x] ADDED mandatory callback to `_config` event callback
 
 
 [2.0.0] - 2017-07-19
@@ -35,7 +35,7 @@
 - [x] ADDED module getter, extras getter and setter
 - [x] ADDED unit tests
 - [x] ADDED module cross-module calls
-- [x] ADDED config module fix
+- [x] ADDED _config module fix
 - [x] REMOVED standard js
 
 

@@ -10,16 +10,13 @@ describe('plant', () => {
     const options = {
         subsDir: './test_plant/subscribers',
         modulesDir: './test_plant/modules',
-        configFile: './test_plant/config.ini'
     };
-    const nats = {connection: true};
     let plant;
 
     before(async function() {
         plant = new Plant('test-plant', options, pack);
         await plant.ready();
-        nats.config = plant.config.nats;
-        plant.set('nats', nats);
+        plant.set('config','config');
     });
 
     it('loads modules available to each other', async () => {
@@ -33,10 +30,9 @@ describe('plant', () => {
         done();
     });
 
-    it('loads config and extras', async () => {
-        const nats = await plant.module('alpha').methodB();
-        assert.isTrue(nats.connection);
-        assert.equal(nats.config.host, 'natsHost');
+    it('loads _config and extras', async () => {
+        const config = await plant.module('alpha').methodB();
+        assert.equal(config, 'config');
     });
 
     it('checks whether plant accessible inside methods (with 2 params)', async function () {

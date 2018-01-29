@@ -5,7 +5,6 @@ const {promisify} = require('util');
 const merge = require('lodash/merge');
 const shortid = require('shortid');
 const forEach = require('lodash/forEach');
-const configLoader = require('yt-config');
 const Module = require('./lib/Module');
 const logger = require('./lib/logger');
 
@@ -20,12 +19,11 @@ module.exports = class extends EventEmitter {
         const defaults = {
             subsDir: 'subscribers',
             modulesDir: 'modules',
-            configFile: 'config.ini'
         };
         const plant = this;
         plant.id = shortid.generate();
         plant.name = name;
-        plant.config = options ? merge(defaults, options) : defaults;
+        plant._config = options ? merge(defaults, options) : defaults;
         plant._extras = {};
         plant._modules = {};
         plant._packageInfo = packageInfo;
@@ -35,13 +33,9 @@ module.exports = class extends EventEmitter {
     async ready() {
 
         const plant = this;
-        process.stdout.write('  ☢ loading config...');
-        const config = await configLoader(plant.config.configFile);
-        plant.config = merge(plant.config, config);
-        console.log('done');
 
         process.stdout.write('  ☢ loading modules...');
-        const modulesDir = path.join(process.cwd(), plant.config.modulesDir);
+        const modulesDir = path.join(process.cwd(), plant._config.modulesDir);
         const moduleDirs = await readDir(modulesDir);
         forEach(moduleDirs, (moduleDir) => {
             const modulePath = path.join(modulesDir, moduleDir);
@@ -52,7 +46,7 @@ module.exports = class extends EventEmitter {
         console.log('done');
 
         process.stdout.write('  ☢ loading subscribers...');
-        const subsDir = path.join(process.cwd(), plant.config.subsDir);
+        const subsDir = path.join(process.cwd(), plant._config.subsDir);
         const subscriberFiles = await readDir(subsDir);
         forEach(subscriberFiles, (subscriberFile) => {
             const subName = path.basename(subscriberFile, '.js');

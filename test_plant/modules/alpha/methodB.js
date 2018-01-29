@@ -2,7 +2,7 @@ module.exports = async function () {
 
     const {plant, logger} = this;
 
-    const nats = plant.get('nats');
+    const config = plant.get('config');
     logger.debug(`called`);
-    return nats;
+    return config;
 };

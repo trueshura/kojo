@@ -28,7 +28,7 @@ async function main() {
     
     const plant = new Plant('plantName', options, pack);
     await plant.ready();
-    const {username, password, host, name} = config.pg;
+    const {username, password, host, name} = _config.pg;
     const pool = new pg.Pool({
         user: username,
         database: name,
