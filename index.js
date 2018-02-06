@@ -55,7 +55,7 @@ module.exports = class extends EventEmitter {
             let subsWrapper = require(requirePath);
             subsWrapper(plant, logger(plant.name, 'sub', subName));
         });
-        process.stdout.write('  ☢ done');
+        process.stdout.write('done\n');
     }
 
     set(key, value) {
