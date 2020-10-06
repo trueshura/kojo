@@ -70,5 +70,4 @@ module.exports = class extends EventEmitter {
         if (!this._modules[name]) throw new Error(`module '${name}' is either not loaded yet or unknown`);
         return this._modules[name];
     }
-
 };
