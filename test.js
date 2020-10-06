@@ -49,4 +49,22 @@ describe('plant', () => {
         }
     });
 
+    it('should NOT call plant error handler', async () => {
+        try {
+            await plant.module('charlie').methodThrows();
+        } catch (error) {
+            assert.strictEqual(error.message, 'Charlie method');
+        }
+    });
+
+    it('should call plant error handler', async () => {
+        const handler=sinon.fake();
+        plant.set('errorHandler', handler);
+        try {
+            await plant.module('charlie').methodThrows();
+        } catch (error) {
+            assert.isOk(handler.calledOnce);
+            assert.strictEqual(error.message, 'Charlie method');
+        }
+    });
 });
