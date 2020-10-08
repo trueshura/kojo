@@ -7,18 +7,17 @@ const shortid = require('shortid');
 const forEach = require('lodash/forEach');
 const Module = require('./lib/Module');
 const logger = require('./lib/logger');
-
+const errorWrapper = require('./lib/errorWrapper');
 
 const readDir = promisify(fs.readdir);
 
-
 module.exports = class extends EventEmitter {
 
-    constructor (name, options, packageInfo={}) {
+    constructor(name, options, packageInfo = {}) {
         super();
         const defaults = {
             subsDir: 'subscribers',
-            modulesDir: 'modules',
+            modulesDir: 'modules'
         };
         const plant = this;
         plant.id = shortid.generate();
@@ -28,6 +27,7 @@ module.exports = class extends EventEmitter {
         plant._modules = {};
         plant._packageInfo = packageInfo;
         plant._subscribers = [];
+        plant._subsLoggers = [];
     }
 
     async ready() {
@@ -52,8 +52,11 @@ module.exports = class extends EventEmitter {
             const subName = path.basename(subscriberFile, '.js');
             const requirePath = path.join(subsDir, subscriberFile);
             plant._subscribers.push(subName);
-            let subsWrapper = require(requirePath);
-            subsWrapper(plant, logger(plant.name, 'sub', subName));
+            const subsWrapper = require(requirePath);
+
+            const cLogger = logger(plant.name, 'sub', subName);
+            plant._subsLoggers.push(cLogger);
+            subsWrapper(plant, cLogger);
         });
         process.stdout.write('done\n');
     }
@@ -69,5 +72,12 @@ module.exports = class extends EventEmitter {
     module(name) {
         if (!this._modules[name]) throw new Error(`module '${name}' is either not loaded yet or unknown`);
         return this._modules[name];
+    }
+
+    setErrorHandler(fErrorHandler) {
+        if (typeof fErrorHandler !== 'function') throw new Error('fErrorHandler is not a function');
+
+        this._subsLoggers.forEach(logger => errorWrapper(logger, fErrorHandler));
+        Object.keys(this._modules).forEach(moduleName => this.module(moduleName).setErrorHandler(fErrorHandler));
     }
 };
