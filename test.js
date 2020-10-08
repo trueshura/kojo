@@ -84,6 +84,10 @@ describe('Kojo', function() {
                 assert.strictEqual(error.message, 'subsC called');
             }
         });
+
+        it('should change logger level', async () => {
+            plant.changeLogLevel('error');
+        });
     });
 
     describe('Logger', function() {

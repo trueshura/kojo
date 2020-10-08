@@ -74,10 +74,25 @@ module.exports = class extends EventEmitter {
         return this._modules[name];
     }
 
+    /**
+     * Allow to call external function every time when logger.error triggered
+     *
+     * @param {Function} fErrorHandler
+     */
     setErrorHandler(fErrorHandler) {
         if (typeof fErrorHandler !== 'function') throw new Error('fErrorHandler is not a function');
 
         this._subsLoggers.forEach(logger => errorWrapper(logger, fErrorHandler));
         Object.keys(this._modules).forEach(moduleName => this.module(moduleName).setErrorHandler(fErrorHandler));
+    }
+
+    /**
+     * Change all loggers logLevel at runtime
+     *
+     * @param {String} strNewLevel
+     */
+    changeLogLevel(strNewLevel) {
+        this._subsLoggers.forEach(logger => logger.transports.console.level = strNewLevel);
+        Object.keys(this._modules).forEach(moduleName => this.module(moduleName).changeLogLevel(strNewLevel));
     }
 };
