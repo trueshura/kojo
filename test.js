@@ -63,6 +63,29 @@ describe('Kojo', function() {
             plant.setErrorHandler(sinon.fake());
         });
 
+        it('should use class method as handler', async () => {
+            const handler=sinon.fake();
+            class A{
+                constructor(props) {
+                    this._msg='this is ok'
+                }
+                errorHandler(err){
+                    handler(this._msg);
+                }
+            }
+            const a=new A();
+            plant.setErrorHandler(a.errorHandler.bind(a));
+
+            try {
+                await plant.module('charlie').methodThrows();
+            } catch (error) {
+                assert.isOk(handler.calledOnce);
+                assert.strictEqual(error.message, 'Charlie method');
+                const [handlerParam]=handler.args[0];
+                assert.strictEqual(handlerParam, 'this is ok');
+            }
+        });
+
         it('should call module error handler', async () => {
             const handler = sinon.fake();
             plant.setErrorHandler(handler);
